@@ -83,7 +83,7 @@
       <button>Start Timer</button>
       <button>End Timer</button>
       <button>Console Trace</button>
-      <button>Trigger a Global Error</button>
+      <button class="gErr">Trigger a Global Error</button>
     </section>
   </main>
 
@@ -95,14 +95,105 @@
       let firstNum = document.querySelector('#first-num').value;
       let secondNum = document.querySelector('#second-num').value;
       let operator = document.querySelector('#operator').value;
-      output.innerHTML = eval(`${firstNum} ${operator} ${secondNum}`);
+      
+      // custom error
+      class AnyaError extends Error {     
+        constructor(message) {
+          super(message);
+          this.name = "AnyaError";
+        } 
+      }
+      function test() {
+        throw new AnyaError("Wrong type but Hiiii");
+      }
+      try {
+        if (firstNum.toLowerCase() == 'anya' || secondNum.toLowerCase() == 'anya') {
+          test();
+        }
+      }
+      catch(err) {
+        console.error(err);
+        return;
+      }
+
+      // firstNum is not number error
+      // secondNum handled in general calc error
+      try {
+        if (isNaN(firstNum)) {
+          throw new Error('Input only numbers');
+        }
+      }
+      catch(err) {
+        console.error(err);
+        return;
+      }
+
+      // general calculator error
+      let str;
+      try {
+        output.innerHTML = eval(`${firstNum} ${operator} ${secondNum}`);
+        str = 'Calculated';
+      }
+      catch(err) {
+        console.error('Smth went wrong when calulating (could be second number): ', err);
+        str = 'Try again';
+      }
+      finally{
+        console.log(str);
+      }
     });
 
     let errorBtns = Array.from(document.querySelectorAll('#error-btns > button'));
 
     // Start your code here
-    // You may move this JS to another file if you wish
+
+    errorBtns.forEach(btn => {
+      if (btn.textContent == 'Console Log') {btn.addEventListener('click', () => {console.log('Log message');})}
+      else if (btn.textContent == 'Console Error') {btn.addEventListener('click', () => {console.error('Error message');})}
+      else if (btn.textContent == 'Console Count') {btn.addEventListener('click', () => {console.count('Count message');})}
+      else if (btn.textContent == 'Console Warn') {btn.addEventListener('click', () => {console.warn('Warn message');})}
+      else if (btn.textContent == 'Console Assert') {btn.addEventListener('click', () => {console.assert(false, 'Assert message');})}
+      else if (btn.textContent == 'Console Clear') {btn.addEventListener('click', () => {console.clear();})}
+      else if (btn.textContent == 'Console Dir') {btn.addEventListener('click', () => {console.dir(form);})}
+      else if (btn.textContent == 'Console dirxml') {btn.addEventListener('click', () => {console.dirxml(form);})}
+      else if (btn.textContent == 'Console Group Start') {btn.addEventListener('click', () => {console.group('Group message');})}
+      else if (btn.textContent == 'Console Group End') {btn.addEventListener('click', () => {console.groupEnd();})}
+      else if (btn.textContent == 'Console Table') {btn.addEventListener('click', () => {console.table([{ day: '1st', exam: 'cse110' }, { day: '2nd', exam: 'cse150b' }]);})}
+      else if (btn.textContent == 'Start Timer') {btn.addEventListener('click', () => {console.time('Timer');})}
+      else if (btn.textContent == 'End Timer') {btn.addEventListener('click', () => {console.timeEnd('Timer');})}
+      else if (btn.textContent == 'Console Trace') {btn.addEventListener('click', () => {
+        
+        function a() {
+          function b() {
+            console.trace();
+          }
+          b();
+        }
+        a(); 
+
+      })}
+
+    });
+
+    window.onerror = function (msg, url, lineNo, columnNo, error) {
+      console.log("Global Error caught");
+      alert("Handling global error");
+    }
+
+    const globalErrBtn =  document.querySelector('.gErr');
+    globalErrBtn.addEventListener('click', () => {
+      someUndefFunction();
+    });
   </script>
+
+  <script src="https://cdn.trackjs.com/agent/v3/latest/t.js"></script>
+  <script>
+    window.TrackJS && TrackJS.install({ 
+      token: "c5fe0c20500b4b25ab90ac4fc5d79000"
+      // for more configuration options, see https://docs.trackjs.com
+    });
+  </script>
+                          
 </body>
 
 </html>
